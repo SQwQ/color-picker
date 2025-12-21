@@ -222,6 +222,15 @@ async function displayCurrentPalette(paletteId) {
     colorDiv.className = 'palette-preview-color';
     colorDiv.style.backgroundColor = color.hex || rgbToHex(color.rgb.r, color.rgb.g, color.rgb.b);
 
+    // Add click handler to display color info
+    colorDiv.addEventListener('click', (e) => {
+      // Don't trigger if clicking delete button
+      if (e.target.classList.contains('palette-preview-delete')) {
+        return;
+      }
+      displayColorFromPalette(color);
+    });
+
     const tooltip = document.createElement('div');
     tooltip.className = 'palette-preview-color-tooltip';
     tooltip.textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
@@ -258,12 +267,33 @@ function hideCurrentPalette() {
   colorWheel.draw();
 }
 
+function displayColorFromPalette(color) {
+  // Set current color
+  currentColor = color;
+
+  // Update color preview
+  const preview = document.getElementById('color-preview');
+  preview.style.backgroundColor = color.hex || rgbToHex(color.rgb.r, color.rgb.g, color.rgb.b);
+
+  // Update color values
+  document.getElementById('rgb-value').textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
+  document.getElementById('hsv-value').textContent = formatHsv(color.hsv.h, color.hsv.s, color.hsv.v);
+
+  // Update color wheel indicator
+  updateColorWheelIndicator(color);
+}
+
 async function removeColorFromCurrentPalette(paletteId, colorIndex) {
   const success = await StorageManager.removeColorFromPalette(paletteId, colorIndex);
 
   if (success) {
     // Refresh the palette display
     await displayCurrentPalette(paletteId);
+
+    // Re-draw current color indicator if one exists
+    if (currentColor) {
+      updateColorWheelIndicator(currentColor);
+    }
   }
 }
 
