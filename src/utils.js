@@ -134,12 +134,14 @@ function formatHsv(h, s, v) {
  * @returns {Object} Position object with x, y coordinates
  */
 function hsvToWheelPosition(h, s, radius) {
-  const angle = (h - 90) * (Math.PI / 180); // -90 to start at top
+  // Convert hue to radians, matching the color wheel drawing
+  // Wheel draws hue=0 at top (angle - 90), so we use the same transformation
+  const angleRad = (h - 90) * (Math.PI / 180);
   const distance = (s / 100) * radius;
 
   return {
-    x: Math.cos(angle) * distance,
-    y: Math.sin(angle) * distance
+    x: Math.cos(angleRad) * distance,
+    y: Math.sin(angleRad) * distance
   };
 }
 

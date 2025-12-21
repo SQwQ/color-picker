@@ -145,9 +145,16 @@ function displayPickedColor(color) {
   const pos = colorWheel.getPositionForColor(color.hsv.h, color.hsv.s);
   const indicator = document.getElementById('color-indicator');
   const canvas = document.getElementById('color-wheel');
-  const rect = canvas.getBoundingClientRect();
+  const container = canvas.parentElement;
 
-  updateColorIndicator(indicator, pos.x, pos.y);
+  // Calculate canvas offset within the flexbox-centered container
+  const containerRect = container.getBoundingClientRect();
+  const canvasRect = canvas.getBoundingClientRect();
+  const offsetX = canvasRect.left - containerRect.left;
+  const offsetY = canvasRect.top - containerRect.top;
+
+  // Position indicator at canvas coordinates + canvas offset
+  updateColorIndicator(indicator, pos.x + offsetX, pos.y + offsetY);
 
   // Enable add to palette button if palette is selected
   const paletteSelect = document.getElementById('palette-select');

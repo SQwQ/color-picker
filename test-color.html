@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Color Test</title>
+</head>
+<body>
+  <h2>Color Conversion Test</h2>
+  <div>
+    <p>Testing RGB(232, 57, 46)</p>
+    <div id="test-color" style="width: 100px; height: 100px; background: rgb(232, 57, 46);"></div>
+    <p id="result"></p>
+  </div>
+
+  <script src="src/utils.js"></script>
+  <script>
+    // Test the conversion
+    const rgb = {r: 232, g: 57, b: 46};
+    const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+
+    document.getElementById('result').innerHTML = `
+      RGB: ${formatRgb(rgb.r, rgb.g, rgb.b)}<br>
+      HSV: ${formatHsv(hsv.h, hsv.s, hsv.v)}<br>
+      <br>
+      Expected HSV: hsv(4°, 80%, 91%)<br>
+      Calculated HSV: hsv(${hsv.h}°, ${hsv.s}%, ${hsv.v}%)
+    `;
+
+    // Test position calculation
+    const pos = hsvToWheelPosition(hsv.h, hsv.s, 90);
+    document.getElementById('result').innerHTML += `<br><br>
+      Position on wheel (radius=90):<br>
+      x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}<br>
+      <br>
+      Angle: ${hsv.h}° - 90 = ${hsv.h - 90}°<br>
+      Distance from center: ${hsv.s}% of 90 = ${(hsv.s / 100 * 90).toFixed(2)}
+    `;
+  </script>
+</body>
+</html>
