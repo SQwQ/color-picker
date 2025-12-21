@@ -40,31 +40,39 @@
     </div>
     <div class="picker-container">
       <button id="pick-color-btn" class="pick-btn">Pick Color from Screen</button>
-      <div class="color-display">
-        <div id="color-preview" class="color-preview"></div>
-        <div class="color-info">
-          <div class="color-values">
-            <div class="value-group">
-              <label>RGB:</label>
-              <span id="rgb-value">-</span>
-            </div>
-            <div class="value-group">
-              <label>HSV:</label>
-              <span id="hsv-value">-</span>
+      <div class="top-panels">
+        <div class="color-display">
+          <div id="color-preview" class="color-preview"></div>
+          <div class="color-info">
+            <div class="color-values">
+              <div class="value-group">
+                <label>RGB:</label>
+                <span id="rgb-value">-</span>
+              </div>
+              <div class="value-group">
+                <label>HSV:</label>
+                <span id="hsv-value">-</span>
+              </div>
             </div>
           </div>
         </div>
+        <div class="palette-selection">
+          <label for="palette-select">Select palette:</label>
+          <div class="palette-select-group">
+            <select id="palette-select">
+              <option value="">-- Select Palette --</option>
+            </select>
+            <button id="create-new-from-picker-btn" class="secondary-btn">+ New</button>
+          </div>
+        </div>
+      </div>
+      <div id="current-palette-preview" class="current-palette-preview" style="display: none;">
+        <h4>Current Palette: <span id="current-palette-name">-</span></h4>
+        <div id="current-palette-colors" class="palette-preview-colors"></div>
       </div>
       <div class="color-wheel-container">
         <canvas id="color-wheel" width="200" height="200"></canvas>
         <div id="color-indicator" class="color-indicator"></div>
-      </div>
-      <div class="palette-selection">
-        <label for="palette-select">Add to palette:</label>
-        <select id="palette-select">
-          <option value="">-- Select Palette --</option>
-        </select>
-        <button id="add-to-palette-btn" disabled>Add Color</button>
       </div>
     </div>
   </div>

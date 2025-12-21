@@ -83,14 +83,21 @@ class ColorWheel {
       const x = this.centerX + pos.x;
       const y = this.centerY + pos.y;
 
-      // Draw marker
+      // Draw marker as a small circle (distinct from the current color indicator)
+      // Outer ring
       ctx.beginPath();
-      ctx.arc(x, y, 4, 0, 2 * Math.PI);
-      ctx.fillStyle = 'white';
+      ctx.arc(x, y, 5, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.fill();
-      ctx.strokeStyle = '#333';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+      ctx.lineWidth = 1.5;
       ctx.stroke();
+
+      // Inner dot for better visibility
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.fill();
     });
   }
 

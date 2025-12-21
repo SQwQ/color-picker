@@ -5,6 +5,7 @@ let currentView = 'main-menu';
 let currentColor = null;
 let currentPalette = null;
 let currentPaletteId = null;
+let currentSelectedPaletteId = null; // Track selected palette in color picker
 let colorWheel = null;
 let editorColorWheel = null;
 
@@ -82,11 +83,8 @@ function initializeEventListeners() {
 
   // Color picker
   document.getElementById('pick-color-btn').addEventListener('click', pickColor);
-  document.getElementById('add-to-palette-btn').addEventListener('click', addColorToPalette);
-  document.getElementById('palette-select').addEventListener('change', (e) => {
-    const btn = document.getElementById('add-to-palette-btn');
-    btn.disabled = !e.target.value || !currentColor;
-  });
+  document.getElementById('create-new-from-picker-btn').addEventListener('click', createNewPaletteFromPicker);
+  document.getElementById('palette-select').addEventListener('change', onPaletteSelectChange);
 
   // Palette editor
   document.getElementById('save-palette-btn').addEventListener('click', savePalette);
@@ -132,16 +130,7 @@ async function pickColor() {
   }
 }
 
-function displayPickedColor(color) {
-  // Update color preview
-  const preview = document.getElementById('color-preview');
-  preview.style.backgroundColor = color.hex;
-
-  // Update color values
-  document.getElementById('rgb-value').textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
-  document.getElementById('hsv-value').textContent = formatHsv(color.hsv.h, color.hsv.s, color.hsv.v);
-
-  // Update color wheel indicator
+function updateColorWheelIndicator(color) {
   const pos = colorWheel.getPositionForColor(color.hsv.h, color.hsv.s);
   const indicator = document.getElementById('color-indicator');
   const canvas = document.getElementById('color-wheel');
@@ -155,11 +144,25 @@ function displayPickedColor(color) {
 
   // Position indicator at canvas coordinates + canvas offset
   updateColorIndicator(indicator, pos.x + offsetX, pos.y + offsetY);
+}
 
-  // Enable add to palette button if palette is selected
-  const paletteSelect = document.getElementById('palette-select');
-  const btn = document.getElementById('add-to-palette-btn');
-  btn.disabled = !paletteSelect.value;
+async function displayPickedColor(color) {
+  // Update color preview
+  const preview = document.getElementById('color-preview');
+  preview.style.backgroundColor = color.hex;
+
+  // Update color values
+  document.getElementById('rgb-value').textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
+  document.getElementById('hsv-value').textContent = formatHsv(color.hsv.h, color.hsv.s, color.hsv.v);
+
+  // Update color wheel indicator
+  updateColorWheelIndicator(color);
+
+  // Auto-add to palette if one is selected
+  const paletteId = document.getElementById('palette-select').value;
+  if (paletteId) {
+    await addColorToPalette();
+  }
 }
 
 function resetColorPicker() {
@@ -168,8 +171,8 @@ function resetColorPicker() {
   document.getElementById('rgb-value').textContent = '-';
   document.getElementById('hsv-value').textContent = '-';
   hideColorIndicator(document.getElementById('color-indicator'));
-  document.getElementById('add-to-palette-btn').disabled = true;
   document.getElementById('palette-select').value = '';
+  hideCurrentPalette();
 }
 
 async function loadPaletteSelect() {
@@ -187,25 +190,134 @@ async function loadPaletteSelect() {
   });
 }
 
+async function onPaletteSelectChange(e) {
+  const paletteId = e.target.value;
+  currentSelectedPaletteId = paletteId;
+
+  if (paletteId) {
+    await displayCurrentPalette(paletteId);
+  } else {
+    hideCurrentPalette();
+    // Redraw wheel without palette colors
+    colorWheel.draw();
+    // Re-show current color indicator if one exists
+    if (currentColor) {
+      updateColorWheelIndicator(currentColor);
+    }
+  }
+}
+
+async function displayCurrentPalette(paletteId) {
+  const palette = await StorageManager.getPalette(paletteId);
+  if (!palette) {
+    hideCurrentPalette();
+    return;
+  }
+
+  const preview = document.getElementById('current-palette-preview');
+  const nameSpan = document.getElementById('current-palette-name');
+  const colorsContainer = document.getElementById('current-palette-colors');
+
+  nameSpan.textContent = palette.name;
+  colorsContainer.innerHTML = '';
+
+  (palette.colors || []).forEach((color, index) => {
+    const colorDiv = document.createElement('div');
+    colorDiv.className = 'palette-preview-color';
+    colorDiv.style.backgroundColor = color.hex || rgbToHex(color.rgb.r, color.rgb.g, color.rgb.b);
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'palette-preview-color-tooltip';
+    tooltip.textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
+
+    // Add delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'palette-preview-delete';
+    deleteBtn.textContent = '×';
+    deleteBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await removeColorFromCurrentPalette(paletteId, index);
+    });
+
+    colorDiv.appendChild(tooltip);
+    colorDiv.appendChild(deleteBtn);
+    colorsContainer.appendChild(colorDiv);
+  });
+
+  preview.style.display = 'block';
+
+  // Draw color wheel with palette colors as small markers
+  colorWheel.drawWithMarkers(palette.colors || []);
+
+  // Re-draw current color indicator if one exists
+  if (currentColor) {
+    updateColorWheelIndicator(currentColor);
+  }
+}
+
+function hideCurrentPalette() {
+  document.getElementById('current-palette-preview').style.display = 'none';
+  currentSelectedPaletteId = null;
+  // Redraw wheel without markers
+  colorWheel.draw();
+}
+
+async function removeColorFromCurrentPalette(paletteId, colorIndex) {
+  const success = await StorageManager.removeColorFromPalette(paletteId, colorIndex);
+
+  if (success) {
+    // Refresh the palette display
+    await displayCurrentPalette(paletteId);
+  }
+}
+
 async function addColorToPalette() {
   if (!currentColor) {
-    alert('Please pick a color first');
     return;
   }
 
   const paletteId = document.getElementById('palette-select').value;
   if (!paletteId) {
-    alert('Please select a palette');
     return;
   }
 
   const success = await StorageManager.addColorToPalette(paletteId, currentColor);
 
   if (success) {
-    alert('Color added to palette successfully!');
-    resetColorPicker();
-  } else {
-    alert('Failed to add color to palette');
+    // Refresh the current palette preview
+    await displayCurrentPalette(paletteId);
+    // Keep color displayed - don't clear anything
+  }
+}
+
+async function createNewPaletteFromPicker() {
+  const paletteName = prompt('Enter a name for the new palette:');
+  if (!paletteName || !paletteName.trim()) {
+    return;
+  }
+
+  const newPalette = {
+    name: paletteName.trim(),
+    description: '',
+    colors: currentColor ? [currentColor] : []
+  };
+
+  const success = await StorageManager.savePalette(newPalette);
+
+  if (success) {
+    // Reload palette list and select the new one
+    await loadPaletteSelect();
+
+    // Find and select the newly created palette
+    const select = document.getElementById('palette-select');
+    const palettes = await StorageManager.getAllPalettes();
+    const createdPalette = palettes.find(p => p.name === paletteName.trim());
+
+    if (createdPalette) {
+      select.value = createdPalette.id;
+      await displayCurrentPalette(createdPalette.id);
+      // Keep color displayed - don't clear anything
+    }
   }
 }
 
