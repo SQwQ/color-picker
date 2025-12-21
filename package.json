@@ -1,0 +1,17 @@
+{
+  "name": "color-picker-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for color picking and palette management",
+  "scripts": {
+    "build": "echo 'No build step required for now'",
+    "test": "echo 'No tests configured yet'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "color-picker",
+    "palette"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {}
+}
