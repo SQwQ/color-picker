@@ -1,24 +1,31 @@
 # Color Picker & Palette Manager
 
-A Chrome browser extension that allows you to pick colors from anywhere on your screen, manage color palettes, and work completely offline.
+A Chrome browser extension that allows you to pick colors from anywhere on your screen, manage color palettes, and work completely offline. Features an adorable "Color Meow" mascot!
 
 ## Features
 
 - **Color Picker**: Pick any color from your screen using the EyeDropper API
-  - View RGB and HSV values
-  - See the selected color's position on a color wheel
-  - Add picked colors to existing palettes
+  - View RGB and HSV values in real-time
+  - Interactive color wheel showing picked color position
+  - Automatically adds picked colors to selected palette
+  - Click any color in current palette to view its info and position
+  - Visual markers on color wheel for all palette colors
+  - Create new palettes directly from the picker
 
 - **Palette Management**: Create and manage color palettes
-  - Create unlimited palettes with custom names and descriptions
-  - Add/remove colors from palettes
-  - View all colors in a palette with their RGB/HSV values
-  - See all palette colors visualized on a color wheel
+  - Create unlimited palettes with custom names
+  - View current palette while picking colors
+  - Click palette colors to display their RGB/HSV values
+  - Delete individual colors from palettes (hover to reveal × button)
+  - Delete entire palettes from the list view (hover to reveal × button)
+  - See all palette colors visualized on the color wheel
+  - Side-by-side layout for easy viewing
 
 - **Import/Export**: Backup and share your palettes
-  - Export all palettes to a JSON file
+  - Export all palettes to JSON file (one click, no confirmation)
   - Import palettes from JSON files
-  - All data stored locally - works completely offline
+  - All data stored locally using Chrome Storage API
+  - Works completely offline
 
 ## Installation
 
@@ -35,34 +42,55 @@ A Chrome browser extension that allows you to pick colors from anywhere on your 
 
 ### Picking Colors
 
-1. Click the extension icon in your toolbar
+1. Click the Color Meow extension icon in your toolbar
 2. Click "Color Picker"
-3. Click "Pick Color from Screen"
-4. Click anywhere on your screen to pick a color
-5. View the RGB/HSV values and color wheel position
-6. Optionally add the color to an existing palette
+3. Select a palette from the dropdown (or create a new one with "+ New")
+4. Click "Pick Color from Screen"
+5. Click anywhere on your screen to pick a color
+6. The color is automatically added to the selected palette
+7. View RGB/HSV values, color wheel position, and all palette colors
+8. Click any color in the current palette to view its information
+
+**Pro Tip**: All colors in your current palette are displayed as small markers on the color wheel, while the currently selected color shows as a larger pulsing indicator.
 
 ### Creating Palettes
 
-1. Click the extension icon
-2. Click "Create New Palette"
-3. Enter a name and optional description
-4. Use the Color Picker to add colors to your palette
-5. Click "Save Palette"
+**From Color Picker:**
+1. In the Color Picker view, click the "+ New" button
+2. Enter a palette name
+3. Start picking colors - they'll be added automatically
+
+**From Palette Editor:**
+1. Click "View Palettes"
+2. Click any existing palette to edit it
+3. Edit the name, description, or manually add/remove colors
+4. Click "Save Palette"
 
 ### Managing Palettes
 
-1. Click the extension icon
-2. Click "View Palettes"
-3. Click any palette to edit it
-4. Remove colors by clicking the × button on each color
-5. Delete palettes using the "Delete Palette" button
+**Deleting Colors:**
+- Hover over any color in the current palette preview
+- Click the red × button that appears
+- No confirmation needed - instant deletion
+
+**Deleting Palettes:**
+- Go to "View Palettes"
+- Hover over any palette card
+- Click the red × button next to the palette name
+- No confirmation needed - instant deletion
 
 ### Exporting/Importing
 
+**Export:**
 1. Click "View Palettes"
-2. Click "Export Palettes" to download all palettes as JSON
-3. Click "Import Palettes" to load palettes from a JSON file
+2. Click "Export Palettes"
+3. JSON file downloads automatically (named `palettes-[timestamp].json`)
+
+**Import:**
+1. Click "View Palettes"
+2. Click "Import Palettes"
+3. Select a JSON file from your computer
+4. Palettes are merged with existing ones
 
 ## Browser Requirements
 
@@ -81,19 +109,21 @@ A Chrome browser extension that allows you to pick colors from anywhere on your 
 
 ```
 color-picker/
-├── manifest.json          # Extension manifest
+├── manifest.json          # Extension manifest (Manifest V3)
 ├── icons/                 # Extension icons
-│   ├── icon16.png
-│   ├── icon32.png
-│   ├── icon48.png
-│   └── icon128.png
+│   ├── icon16.png        # Generated from color-meow.png
+│   ├── icon32.png        # Toolbar icon
+│   ├── icon48.png        # Extensions page
+│   ├── icon128.png       # Chrome Web Store
+│   └── color-meow.png    # Original mascot artwork
 ├── src/
-│   ├── popup.html         # Main popup UI
-│   ├── popup.css          # Styling
-│   ├── popup.js           # Main application logic
-│   ├── colorWheel.js      # Color wheel rendering
-│   ├── storage.js         # Chrome storage wrapper
-│   └── utils.js           # Color conversion utilities
+│   ├── popup.html        # Main popup UI (500x600px max)
+│   ├── popup.css         # Styling with animations
+│   ├── popup.js          # Main application logic
+│   ├── colorWheel.js     # Canvas-based color wheel
+│   ├── storage.js        # Chrome Storage API wrapper
+│   └── utils.js          # RGB/HSV conversion utilities
+├── create_icons.py       # Icon generation script
 └── README.md
 ```
 
