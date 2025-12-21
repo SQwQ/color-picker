@@ -1,0 +1,9 @@
+This repo implements a Chrome browser extension color picker which fulfills the following feature requirements :
+
+A dropdown menu of 3 buttons will appear when the extension is clicked:
+
+1. Color picker button which allows users to select a desired color using the mouse. User should be able to see the position of the selected color on the color wheel and also see the rgb and hsv values of the selected color. User should be able to add color to existing/new palette, which is just a locally cached set of colors. More details on this will be given in the color palette button section.
+2. The create new color palette button which will just create a new empty set of colors which stores a list of rgb + hsv values. Users should be able to see all colors in a rectangular strip and see the hsv/rgb values when they mouse over each color. Users should be able to see a color wheel that shows the position of all the colors in the palette. Users should be able delete palettes, add or remove colors from palettes, give each palette a name and a short description
+3. The view palettes button shows a drop down of all locally cached palettes where each palette shows the name in 1 row and the first 10 colors in the palette in a rectangular strip in the 2nd row. Users should be able to download palettes which will just download the all saved palettes in a palettes.json file. Users should also be able to import palettes by opening a local palettes.json file
+
+All storage shld be cached/local and the extension shld work without internet connection. 
