@@ -57,10 +57,6 @@ function initializeEventListeners() {
     loadPaletteSelect();
   });
 
-  document.getElementById('btn-create-palette').addEventListener('click', () => {
-    startNewPalette();
-  });
-
   document.getElementById('btn-view-palettes').addEventListener('click', () => {
     showView('palettes-list-view');
     renderPalettesList();
@@ -467,11 +463,32 @@ async function renderPalettesList() {
   palettes.forEach(palette => {
     const card = document.createElement('div');
     card.className = 'palette-card';
-    card.addEventListener('click', () => editPalette(palette.id));
+    card.addEventListener('click', (e) => {
+      // Don't open editor if delete button was clicked
+      if (e.target.classList.contains('palette-card-delete')) {
+        return;
+      }
+      editPalette(palette.id);
+    });
+
+    // Header with name and delete button
+    const header = document.createElement('div');
+    header.className = 'palette-card-header';
 
     const name = document.createElement('div');
     name.className = 'palette-card-name';
     name.textContent = palette.name;
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'palette-card-delete';
+    deleteBtn.textContent = '×';
+    deleteBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await deletePaletteFromList(palette.id);
+    });
+
+    header.appendChild(name);
+    header.appendChild(deleteBtn);
 
     const colorsContainer = document.createElement('div');
     colorsContainer.className = 'palette-card-colors';
@@ -489,10 +506,19 @@ async function renderPalettesList() {
       colorsContainer.appendChild(colorBox);
     });
 
-    card.appendChild(name);
+    card.appendChild(header);
     card.appendChild(colorsContainer);
     container.appendChild(card);
   });
+}
+
+async function deletePaletteFromList(paletteId) {
+  const success = await StorageManager.deletePalette(paletteId);
+
+  if (success) {
+    // Refresh the palettes list
+    await renderPalettesList();
+  }
 }
 
 async function loadPalettes() {
@@ -515,8 +541,6 @@ async function exportPalettes() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-
-  alert('Palettes exported successfully!');
 }
 
 async function importPalettes(event) {
