@@ -82,6 +82,14 @@ function initializeEventListeners() {
   document.getElementById('create-new-from-picker-btn').addEventListener('click', createNewPaletteFromPicker);
   document.getElementById('palette-select').addEventListener('change', onPaletteSelectChange);
 
+  // Copy to clipboard when clicking color preview
+  document.getElementById('color-preview').addEventListener('click', () => {
+    if (currentColor) {
+      const hexColor = currentColor.hex || rgbToHex(currentColor.rgb.r, currentColor.rgb.g, currentColor.rgb.b);
+      copyToClipboard(hexColor);
+    }
+  });
+
   // Palette editor
   document.getElementById('save-palette-btn').addEventListener('click', savePalette);
   document.getElementById('delete-palette-btn').addEventListener('click', deletePalette);
@@ -146,10 +154,13 @@ async function displayPickedColor(color) {
   // Update color preview
   const preview = document.getElementById('color-preview');
   preview.style.backgroundColor = color.hex;
+  preview.style.cursor = 'pointer';
+  preview.title = 'Click to copy hex code';
 
   // Update color values
   document.getElementById('rgb-value').textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
   document.getElementById('hsv-value').textContent = formatHsv(color.hsv.h, color.hsv.s, color.hsv.v);
+  document.getElementById('hex-value').textContent = color.hex;
 
   // Update color wheel indicator
   updateColorWheelIndicator(color);
@@ -220,20 +231,19 @@ async function displayCurrentPalette(paletteId) {
   (palette.colors || []).forEach((color, index) => {
     const colorDiv = document.createElement('div');
     colorDiv.className = 'palette-preview-color';
-    colorDiv.style.backgroundColor = color.hex || rgbToHex(color.rgb.r, color.rgb.g, color.rgb.b);
+    const hexColor = color.hex || rgbToHex(color.rgb.r, color.rgb.g, color.rgb.b);
+    colorDiv.style.backgroundColor = hexColor;
+    colorDiv.title = 'Click to copy hex code';
 
-    // Add click handler to display color info
+    // Add click handler to copy hex and display color info
     colorDiv.addEventListener('click', (e) => {
       // Don't trigger if clicking delete button
       if (e.target.classList.contains('palette-preview-delete')) {
         return;
       }
+      copyToClipboard(hexColor);
       displayColorFromPalette(color);
     });
-
-    const tooltip = document.createElement('div');
-    tooltip.className = 'palette-preview-color-tooltip';
-    tooltip.textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
 
     // Add delete button
     const deleteBtn = document.createElement('button');
@@ -244,7 +254,6 @@ async function displayCurrentPalette(paletteId) {
       await removeColorFromCurrentPalette(paletteId, index);
     });
 
-    colorDiv.appendChild(tooltip);
     colorDiv.appendChild(deleteBtn);
     colorsContainer.appendChild(colorDiv);
   });
@@ -273,14 +282,28 @@ function displayColorFromPalette(color) {
 
   // Update color preview
   const preview = document.getElementById('color-preview');
-  preview.style.backgroundColor = color.hex || rgbToHex(color.rgb.r, color.rgb.g, color.rgb.b);
+  const hexColor = color.hex || rgbToHex(color.rgb.r, color.rgb.g, color.rgb.b);
+  preview.style.backgroundColor = hexColor;
+  preview.style.cursor = 'pointer';
+  preview.title = 'Click to copy hex code';
 
   // Update color values
   document.getElementById('rgb-value').textContent = formatRgb(color.rgb.r, color.rgb.g, color.rgb.b);
   document.getElementById('hsv-value').textContent = formatHsv(color.hsv.h, color.hsv.s, color.hsv.v);
+  document.getElementById('hex-value').textContent = hexColor;
 
   // Update color wheel indicator
   updateColorWheelIndicator(color);
+}
+
+async function copyToClipboard(hexColor) {
+  try {
+    await navigator.clipboard.writeText(hexColor);
+    // Visual feedback - could add a toast notification here
+    console.log('Copied to clipboard:', hexColor);
+  } catch (err) {
+    console.error('Failed to copy:', err);
+  }
 }
 
 async function removeColorFromCurrentPalette(paletteId, colorIndex) {
