@@ -68,9 +68,14 @@
         <h4>Current Palette: <span id="current-palette-name">-</span></h4>
         <div id="current-palette-colors" class="palette-preview-colors"></div>
       </div>
-      <div class="color-wheel-container">
-        <canvas id="color-wheel" width="200" height="200"></canvas>
-        <div id="color-indicator" class="color-indicator"></div>
+      <div class="color-wheels-row">
+        <div class="color-wheel-container">
+          <canvas id="color-wheel" width="200" height="200"></canvas>
+          <div id="color-indicator" class="color-indicator"></div>
+        </div>
+        <div class="hsv-wheel-container">
+          <canvas id="hsv-wheel" width="200" height="200"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -124,6 +129,7 @@
   <script src="utils.js"></script>
   <script src="storage.js"></script>
   <script src="colorWheel.js"></script>
+  <script src="hsvWheel.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

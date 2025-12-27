@@ -7,12 +7,14 @@ let currentPalette = null;
 let currentPaletteId = null;
 let currentSelectedPaletteId = null; // Track selected palette in color picker
 let colorWheel = null;
+let hsvWheel = null;
 let editorColorWheel = null;
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', async () => {
   initializeViews();
   initializeColorWheel();
+  initializeHSVWheel();
   initializeEventListeners();
   await loadPalettes();
 });
@@ -47,6 +49,31 @@ function initializeColorWheel() {
     editorColorWheel = new ColorWheel(editorCanvas);
     editorColorWheel.draw();
   }
+}
+
+function initializeHSVWheel() {
+  hsvWheel = new HSVColorWheel('hsv-wheel');
+  hsvWheel.draw();
+
+  // Set up callback for when user clicks on HSV wheel
+  hsvWheel.onColorChange = async (h, s, v) => {
+    // Convert HSV to RGB
+    const rgb = hsvToRgb(h, s, v);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+
+    // Create color object
+    const color = {
+      rgb: rgb,
+      hsv: { h, s, v },
+      hex: hex
+    };
+
+    // Update current color
+    currentColor = color;
+
+    // Update displays
+    await displayPickedColor(color);
+  };
 }
 
 // Event Listeners
@@ -164,6 +191,11 @@ async function displayPickedColor(color) {
 
   // Update color wheel indicator
   updateColorWheelIndicator(color);
+
+  // Update HSV wheel
+  if (hsvWheel) {
+    hsvWheel.drawIndicators(color.hsv.h, color.hsv.s, color.hsv.v);
+  }
 
   // Auto-add to palette if one is selected
   const paletteId = document.getElementById('palette-select').value;
@@ -294,6 +326,11 @@ function displayColorFromPalette(color) {
 
   // Update color wheel indicator
   updateColorWheelIndicator(color);
+
+  // Update HSV wheel
+  if (hsvWheel) {
+    hsvWheel.drawIndicators(color.hsv.h, color.hsv.s, color.hsv.v);
+  }
 }
 
 async function copyToClipboard(hexColor) {

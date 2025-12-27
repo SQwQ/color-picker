@@ -175,6 +175,12 @@ body {
   color: #333;
 }
 
+.color-wheels-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
 .color-wheel-container {
   position: relative;
   display: flex;
@@ -184,11 +190,29 @@ body {
   background: white;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
+  flex: 1;
+}
+
+.hsv-wheel-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  flex: 1;
 }
 
 #color-wheel {
   display: block;
   border-radius: 50%;
+}
+
+#hsv-wheel {
+  display: block;
+  cursor: crosshair;
 }
 
 .color-indicator {
