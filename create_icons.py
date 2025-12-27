@@ -1,25 +1,34 @@
 from PIL import Image
+import sys
+
+# Get filename from command line argument, default to newAvatar.png
+if len(sys.argv) > 1:
+    filename = sys.argv[1]
+else:
+    filename = 'newAvatar.png'
 
 # Open the source image
-source = Image.open('icons/color-meow.png')
+source_path = f'icons/{filename}'
+print(f'Using source image: {source_path}')
+
+source = Image.open(source_path)
 
 # Convert to RGBA if not already
 source = source.convert('RGBA')
 
-# Get the main character area (crop out the text at bottom)
-# The image appears to be approximately 1024x1024, and we want to focus on the character
+# The image should be square already, but let's ensure it
 width, height = source.size
-# Crop to remove bottom text area - estimate about 15% from bottom
-crop_height = int(height * 0.80)
-cropped = source.crop((0, 0, width, crop_height))
 
-# Create a square version centered
-min_dim = min(cropped.size)
-left = (cropped.width - min_dim) // 2
-top = (cropped.height - min_dim) // 2
-right = left + min_dim
-bottom = top + min_dim
-square = cropped.crop((left, top, right, bottom))
+# Create a square version centered if needed
+if width != height:
+    min_dim = min(width, height)
+    left = (width - min_dim) // 2
+    top = (height - min_dim) // 2
+    right = left + min_dim
+    bottom = top + min_dim
+    square = source.crop((left, top, right, bottom))
+else:
+    square = source
 
 # Resize to different icon sizes with high-quality resampling
 sizes = [16, 32, 48, 128]

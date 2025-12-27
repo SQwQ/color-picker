@@ -1,24 +1,28 @@
 # Color Picker & Palette Manager
 
-A Chrome browser extension that allows you to pick colors from anywhere on your screen, manage color palettes, and work completely offline. Features an adorable "Color Meow" mascot!
+A Chrome browser extension that allows you to pick colors from anywhere on your screen, manage color palettes, and work completely offline. Features a cute yellow cat mascot!
 
 ## Features
 
 - **Color Picker**: Pick any color from your screen using the EyeDropper API
-  - View RGB and HSV values in real-time
-  - Interactive color wheel showing picked color position
+  - View RGB, HSV, and HEX values in real-time
+  - Dual color wheel visualization:
+    - **Standard Color Wheel**: Shows picked color position with all palette colors as markers
+    - **HSV Wheel**: Interactive hue ring + saturation/value triangle for precise color selection
+  - Click anywhere on the HSV wheel to select colors interactively
   - Automatically adds picked colors to selected palette
-  - Click any color in current palette to view its info and position
+  - Click any color in current palette to view its info and copy HEX code
+  - One-click copy to clipboard for HEX codes (click color preview or palette colors)
   - Visual markers on color wheel for all palette colors
   - Create new palettes directly from the picker
 
 - **Palette Management**: Create and manage color palettes
   - Create unlimited palettes with custom names
   - View current palette while picking colors
-  - Click palette colors to display their RGB/HSV values
+  - Click palette colors to display their RGB/HSV/HEX values AND copy HEX to clipboard
   - Delete individual colors from palettes (hover to reveal × button)
   - Delete entire palettes from the list view (hover to reveal × button)
-  - See all palette colors visualized on the color wheel
+  - See all palette colors visualized on both color wheels
   - Side-by-side layout for easy viewing
 
 - **Import/Export**: Backup and share your palettes
@@ -42,16 +46,29 @@ A Chrome browser extension that allows you to pick colors from anywhere on your 
 
 ### Picking Colors
 
-1. Click the Color Meow extension icon in your toolbar
+**From Screen:**
+1. Click the extension icon in your toolbar
 2. Click "Color Picker"
 3. Select a palette from the dropdown (or create a new one with "+ New")
 4. Click "Pick Color from Screen"
 5. Click anywhere on your screen to pick a color
 6. The color is automatically added to the selected palette
-7. View RGB/HSV values, color wheel position, and all palette colors
-8. Click any color in the current palette to view its information
+7. View RGB/HSV/HEX values and both color wheel visualizations
 
-**Pro Tip**: All colors in your current palette are displayed as small markers on the color wheel, while the currently selected color shows as a larger pulsing indicator.
+**From HSV Wheel:**
+1. Click anywhere on the hue ring (outer donut) to select a hue
+2. Click within the triangle to select saturation and value
+3. Color automatically updates and adds to the selected palette
+
+**Copying Colors:**
+- Click the color preview box to copy HEX code to clipboard
+- Click any color in the current palette to copy its HEX code
+- HEX code is copied instantly without confirmation
+
+**Pro Tips**:
+- All colors in your current palette are displayed as small white dots on the standard color wheel
+- The currently selected color shows as a larger pulsing indicator
+- The HSV wheel's triangle rotates to show the selected hue at the top vertex
 
 ### Creating Palettes
 
@@ -102,8 +119,12 @@ A Chrome browser extension that allows you to pick colors from anywhere on your 
 - Built with vanilla JavaScript (no frameworks)
 - Uses Chrome Extension Manifest V3
 - Offline-first using Chrome Storage API
-- Canvas-based color wheel visualization
+- Dual canvas-based color wheel visualizations:
+  - Standard RGB color wheel with palette markers
+  - HSV wheel with interactive hue ring and saturation/value triangle
 - RGB ↔ HSV color conversion utilities
+- Clipboard API for one-click HEX code copying
+- Barycentric coordinate system for triangle color selection
 
 ## File Structure
 
@@ -111,21 +132,38 @@ A Chrome browser extension that allows you to pick colors from anywhere on your 
 color-picker/
 ├── manifest.json          # Extension manifest (Manifest V3)
 ├── icons/                 # Extension icons
-│   ├── icon16.png        # Generated from color-meow.png
-│   ├── icon32.png        # Toolbar icon
-│   ├── icon48.png        # Extensions page
-│   ├── icon128.png       # Chrome Web Store
-│   └── color-meow.png    # Original mascot artwork
+│   ├── icon16.png        # 16x16 toolbar icon
+│   ├── icon32.png        # 32x32 icon
+│   ├── icon48.png        # 48x48 extensions page icon
+│   ├── icon128.png       # 128x128 Chrome Web Store icon
+│   ├── newAvatar.png     # Source mascot artwork (yellow cat)
+│   └── color-meow.png    # Original mascot artwork (archived)
 ├── src/
 │   ├── popup.html        # Main popup UI (500x600px max)
 │   ├── popup.css         # Styling with animations
 │   ├── popup.js          # Main application logic
-│   ├── colorWheel.js     # Canvas-based color wheel
+│   ├── colorWheel.js     # Standard RGB color wheel
+│   ├── hsvWheel.js       # HSV wheel with hue ring + SV triangle
 │   ├── storage.js        # Chrome Storage API wrapper
 │   └── utils.js          # RGB/HSV conversion utilities
-├── create_icons.py       # Icon generation script
+├── create_icons.py       # Icon generation script (accepts filename argument)
 └── README.md
 ```
+
+## Generating Icons
+
+To regenerate icons from a source image:
+
+```bash
+python create_icons.py <filename>
+```
+
+Example:
+```bash
+python create_icons.py newAvatar.png
+```
+
+This will create icon16.png, icon32.png, icon48.png, and icon128.png from the source image.
 
 ## License
 
